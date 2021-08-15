@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  pg1:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${BACKEND_DB_CONN_PASS}
+    ports:
+      - "5432:5432"
+
+  web_backend:
+    image: personal_page_backend
+    restart: always
+    environment:
+      - PG_PASS=${BACKEND_DB_CONN_PASS}
+      - PG_ADDR=${BACKEND_DB_CONN_ADDR}
+      - last50papersViewName=${last50papersViewName}
+      - getFrequencyEventsViewName=${getFrequencyEventsViewName}
+    depends_on:
+      - "pg1"
+    ports:
+      - "5001:5001"
+
+  web_frontend:
+    depends_on:
+      - "pg1"
+    image: web_frontend
+    restart: always
+    ports:
+      - "80:3000"
